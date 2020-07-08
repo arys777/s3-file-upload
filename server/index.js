@@ -4,16 +4,14 @@ var aws = require('aws-sdk');
 var uuid = require('uuid');
 require("dotenv").config();
 
-const BUCKET_NAME = "eventpop-test";
-
-const s3 = new aws.S3({ bucket: BUCKET_NAME });
+const s3 = new aws.S3({ bucket: process.env.AWS_S3_BUCKET });
 
 app.get("/sign", (req, res) => {
   const name = req.query.name;
   const type = req.query.type;
   const key = `uploads/${uuid.v4()}_${name}`;
   const uploadURL = s3.getSignedUrl("putObject", {
-    Bucket: BUCKET_NAME,
+    Bucket: process.env.AWS_S3_BUCKET,
     Key: key,
     ContentType: type,
     ACL: "public-read"
@@ -26,7 +24,7 @@ app.get("/sign", (req, res) => {
 
   res.send({
     uploadURL,
-    fileURL: `https://${BUCKET_NAME}.s3.amazonaws.com/${key}`,
+    fileURL: `https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/${key}`,
   });
 })
 
